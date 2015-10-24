@@ -1,0 +1,295 @@
+<html>
+<head>
+    <style>
+        .answer {
+            min-height: 50px
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Image Diffusion Analysis</h1>
+
+    <section id="q1" class="question">a
+        <h4>How many unique original images?</h4>
+        (hint: use 'Image Id Str')
+        <div class="answer"></div>
+    </section>
+
+    <section id="q2" class="question">
+        <h4>How many unique original tweet users?</h4>
+        <div class="answer"></div>
+    </section>
+
+    <section id="q3" class="question">
+        <h4>How many times did image (592674938273865700) get retweeted?</h4>
+        (the answer should be 10. see if you can compute it)
+        <div class="answer"></div>
+    </section>
+
+    <section id="q4" class="question">
+        <h4>Which image has the most number of retweets?</h4>
+        (hint: use 'Image Id Str')
+        <div class="answer"></div>
+    </section>
+
+    <section id="q5" class="question">
+        <h4>How many original tweets were there on 4/26/15?</h4>
+        <div class="answer"></div>
+    </section>
+
+    <section id="q6" class="question">
+        <h4>Among these original tweets on 4/26/15, what is the most number of times one was retweeted?</h4>
+        <div class="answer"></div>
+    </section>
+
+    <section id="q7" class="question">
+        <h4>Among these original tweets on 4/26/15, what is the average number of times one was retweeted?</h4>
+        <div class="answer"></div>
+    </section>
+
+    <section id="q8" class="question">
+        <h4>Among these original tweets on 4/26/15, how many of them got retweeted within one hour?</h4>
+        <div class="answer"></div>
+    </section>
+
+    <section id="q9" class="question">
+        <h4>Among these original tweets on 4/26/15, what are the ten most retweeted?</h4>
+        <div class="answer"></div>
+    </section>
+
+    <section id="q10" class="question">
+        <h4>Among these ten most retweeted, how many of them contain images of people?</h4>
+        (hint: you will need to look at the photos yourself)
+        <div class="answer"></div>
+    </section>
+
+</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+
+    <script src="/js/moment.min.js"></script>
+    <script>
+
+var items   // global scope (i.e., can be accessed in javascript console)
+
+function solution1(data){
+    var unique = _.uniq(data, function(d) {
+        return d["Image Id Str"];
+    });
+    return _.size(unique);
+}
+
+function solution2(data){
+    var unique = _.uniq(data, function(d) {
+        return d["Original User Name"];
+    });
+    return _.size(unique);
+}
+
+function solution3(data){
+
+    filtered =  _.filter(data, function(d){
+        return ( d["Rt"] == "Retweet" && d["Image Id Str"] == 592674938273865700 )
+        })
+        return _.size(filtered) 
+}
+
+function solution4(data){
+    var groups = _.groupBy(data,"Image Id Str")
+    return _.size(groups)
+}
+
+function solution5(data){
+    filtered =  _.filter(data, function(d){
+        return ( d["Rt"] == "Original Tweet (probably)"
+            && _.startsWith(d["* Tweet Created At"],"4/26/15 "))
+        });
+        return _.size(filtered) 
+}
+
+// needed in solutions 6-10
+// Creates 2 collections - original tweets and retweets
+// returns an array of objects:
+// for each uniq "Image Id Str" of original tweets, count of retweets
+// with same image ID
+function getRetweetCounts(data){
+    var original =  _.filter(data, function(d){
+        return ( d["Rt"] == "Original Tweet (probably)"
+            && _.startsWith(d["* Tweet Created At"],"4/26/15 "))
+        });
+
+
+    // there is at least one Image Id Str (592285978557075500)that shows up in 2
+    // different original tweets, so run this through uniq
+
+    original = _.uniq(original,function(d){
+        return d["Image Id Str"];
+    })
+
+    
+    var retweet =  _.filter(data, function(d){
+        return ( d["Rt"] == "Retweet")
+        })
+    var groups = _.groupBy(retweet,"Image Id Str")
+    
+    var size = _.size(groups);
+    var counts = _.map(original, function(d){
+        var count = _.size(groups[d["Image Id Str"]]);
+        var obj = {ID:d["Image Id Str"], count:count}
+        return obj;
+    })
+    return counts;
+}
+
+function solution6(data){
+    
+    
+    var counts = getRetweetCounts(data);
+
+    var maxObj = _.max(counts,function(d){
+        return d.count;
+    })
+
+    return maxObj.count;
+}
+
+function solution7(data){
+    var counts = getRetweetCounts(data);
+    var sum = _.sum(counts, function(d){
+        return d.count;
+    })
+    return sum/_.size(counts);
+}
+
+function solution8(data){
+    // try to use the moment.js library to work with timestamps
+    // this is how you get the moment object representing the time a tweet was created
+    var momentCreatedAt = moment(new Date(items[0]['* Tweet Created At']));
+    var original =  _.filter(data, function(d){
+        return ( d["Rt"] == "Original Tweet (probably)"
+            && _.startsWith(d["* Tweet Created At"],"4/26/15 "))
+        });
+    // there is at least one Image Id Str (592285978557075500)that shows up in 2
+    // different original tweets, so run this through uniq
+
+    original = _.uniq(original,function(d){
+        return d["Image Id Str"];
+    })
+var retweet =  _.filter(data, function(d){
+        return ( d["Rt"] == "Retweet")
+        })
+    var groups = _.groupBy(retweet,"Image Id Str")
+    var info = _.map(original, function(d){
+        // groups[d["Image Id Str"]] is the array of tweets for each picture ID
+        var tweetDate = new Date(items[0]['* Tweet Created At'])
+        var tweetTime = moment(tweetDate);
+        // find one retweet that is less than hour  after orig tweet
+        oneHourRetweet = _.find(groups[d["Image Id Str"]], function(e){
+            var retweetDate = new Date(e['* Tweet Created At'])
+            var retweetTime = moment(retweetDate);
+            return retweetTime.isBefore(tweetTime.add(1,'hour'));
+        });
+        var obj = {ID:d["Image Id Str"], retweet: oneHourRetweet}
+        return obj;
+    });
+    // hints: you may need to use these methods to get an one hour window
+    // http://momentjs.com/docs/#/durations/add/
+    // http://momentjs.com/docs/#/query/is-before/
+   
+    // remove all the obj w/o a retweet
+    var retweeted = _.filter(info, 'retweet')
+    return _.size(retweeted);
+}
+// 10 most retweeted tweets
+function solution9(data){
+    var counts = getRetweetCounts(data);
+
+    var sorted = _.sortByOrder(counts, function(d){
+        return d.count;
+    }, 'desc') ;
+    var top10 =  _.slice(sorted, 0, 10) ; 
+    var listString = _.reduce(top10, function(result, d){
+        return result+", "+d.ID
+    },"")
+// remove 1st comma and whitespace from beginning
+return _.trimLeft(listString, ', ');
+}
+
+function solution10(data){
+
+        // ideally, I would go through all of the pictures, and figure which have people, but I am cheating and only going through the top 10.
+        // but let's pretend hasPeople is a big array of all the images...
+        var hasPeople = {592346411963797500: true,
+        592131266708770800:false, 
+        592139111860940800:true, 
+        592149979889819600: true,
+        592285978557075500:true,
+        592130916870266900:false, //same pic? 
+        592152575081893900:true, 
+        592139885361950700:true,
+        592138660834836500:false,
+        592137444784476200:true};
+
+    var counts = getRetweetCounts(data);
+
+    var sorted = _.sortByOrder(counts, function(d){
+        return d.count;
+    }, 'desc') ;
+
+    var top10 =  _.slice(sorted, 0, 10) ; 
+
+    var picCount = _.reduce(top10, function(result, d){
+        console.log(d.ID+ ":"+hasPeople[d.ID])
+        if (hasPeople[d.ID]) {
+            return result+1
+        }
+        return result;
+    },0)
+return picCount;
+}
+
+function run(id, solutionFunc, data){
+    console.log('run solution for ' + id)
+    var answer = solutionFunc(data)
+    $(id).find('.answer').html(answer)
+}
+
+function loadDataThenRunSolutions(){
+    $.get({url: './nepal_local_tweets.json'})
+     .done(function(data){
+        //  var lines = data.trim().split('\n')
+        items = data
+         // convert text lines to json arrays and save them in `items`
+        //  items = _.map(lines, JSON.parse)
+
+         console.log('number of items loaded:', items.length)
+         console.log('first item', items[0])
+
+         run('#q1', solution1, items)
+         run('#q2', solution2, items)
+         run('#q3', solution3, items)
+         run('#q4', solution4, items)
+         run('#q5', solution5, items)
+         run('#q6', solution6, items)
+         run('#q7', solution7, items)
+         run('#q8', solution8, items)
+         run('#q9', solution9, items)
+         run('#q10', solution10, items)
+     })
+     .fail(function(err){
+         console.error(err)
+     })
+}
+
+loadDataThenRunSolutions()
+
+    </script>
+
+</body>
+</html>

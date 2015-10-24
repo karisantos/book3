@@ -48,12 +48,26 @@ var items   // global scope (i.e., can be accessed in javascript console)
 
 function solution1(){
     // TODO: replace the hard coded values in series by actual computation
-    var data = {
-          labels: ['HIST', 'HONR', 'HUMN', 'IAFS', 'IPHY'],
-          series: [
-            [121,23,42,56,12]
-          ]
-    }
+    var groups = _.groupBy(items, 'CrsPBADept');
+    var dept = ['HIST', 'HONR', 'HUMN', 'IAFS', 'IPHY'];
+    var filtered = _.map(dept,function(d){
+      return {dept:d, count:_.size(groups[d])}
+    })
+
+    var data = _.reduce(filtered,function(result,d){
+            result.labels.push(d.dept);
+            result.series[0].push(d.count);
+            return result;
+
+        },{labels: [],series: [[]]})
+
+    // var olddata = {
+
+    //       labels: ['HIST', 'HONR', 'HUMN', 'IAFS', 'IPHY'],
+    //       series: [
+    //         [121,23,42,56,12]
+    //       ]
+    // }
     new Chartist.Bar('#q1 .answer', data);
 }
 
@@ -75,18 +89,72 @@ function solution2(){
 
 
 function solution3(){
+  var groups = _.groupBy(items, 'CrsPBADept')
+    var counts = _.mapValues(groups, function(g){
+        return g.length
+    })
+
+    var countArray = _.pairs(counts);
+    var filtered = _.filter(countArray, function(d,key) {
+        return d[1] >= 100;
+    });
+    var data = {
+          labels: _.keys(_.zipObject(filtered)),
+          series: [
+            _.values(_.zipObject(filtered))
+          ]
+    }
+    new Chartist.Bar('#q3 .answer', data);
 }
 
+
 function solution4(){
+  var groups = _.groupBy(items, 'CrsPBADept')
+    var counts = _.mapValues(groups, function(g){
+        return g.length
+    })
+  var countArray = _.pairs(counts);
+  var sorted = _.sortByOrder(countArray, function(d){
+      return d[1];
+  },'desc');
+  var top10 = _.slice(sorted, 0, 10)
+
+  //var sorted2 = _.map(_.sortByOrder(counts,function(d){
+  //      return d})    ,counts)
+var data = {
+          labels: _.keys(_.zipObject(top10)),
+          series: [
+            _.values(_.zipObject(top10))
+          ]
+    }
+    new Chartist.Bar('#q4 .answer', data);
 }
 
 function solution5(){
     // TODO: replace the hard coded values in series by actual computation
-    var data = {
-          labels: ['1xxx', '2xxx', '3xxx', '4xxx'],
+    var hist = _.filter(items, 'CrsPBADept', 'HIST');
+    var csci = _.filter(items, 'CrsPBADept', 'CSCI');
+    var histGrp = _.groupBy(hist, 'CrsLvlNum');
+    var csciGrp = _.groupBy(csci, 'CrsLvlNum');
+    var histCounts = _.mapValues(histGrp, function(g){
+        return g.length
+      });
+    var csciCounts = _.mapValues(csciGrp, function(g){
+        return g.length
+      });    
+    var hCountArray = _.pairs(histCounts);
+    var sortedH = _.sortByOrder(hCountArray, function(d){
+      return d[0];
+  },'asc');
+    var cCountArray = _.pairs(csciCounts);
+    var sortedC = _.sortByOrder(cCountArray, function(d){
+      return d[0];
+  },'asc');
+   var data = {
+          labels: _.keys(_.zipObject(sortedH)),
           series: [
-            [20,30,40,50],  // CSCI
-            [30,30,30,30]   // HIST
+            _.values(_.zipObject(sortedC)),  // CSCI
+            _.values(_.zipObject(sortedH))   // HIST
           ]
     }
     new Chartist.Bar('#q5 .answer', data);
