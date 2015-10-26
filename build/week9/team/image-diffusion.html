@@ -102,7 +102,16 @@ function solution3(data){
 
 function solution4(data){
     var groups = _.groupBy(data,"Image Id Str")
-    return _.size(groups)
+    var counts = _.map(groups, function(d,key){
+        var count = _.size(d);
+        var obj = {ID:key, count:count}
+        return obj;
+    })
+    var maxObj = _.max(counts,function(d){
+        return d.count;
+    })
+
+    return maxObj.ID;
 }
 
 function solution5(data){
