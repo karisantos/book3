@@ -85,37 +85,118 @@ function solution2(){
 }
 
 function solution3(){
-    var businessesInGilbert = _.filter(items, {city: 'Gilbert'})
-    // TODO: find McDonloads and compute the distance between the first two
-    return 'TODO'
+    var businessesInGilbert = _.filter(items, {city: 'Gilbert'});
+    var mcDInGilbert = _.filter(businessesInGilbert, {"name": "McDonald's"});
+    var m0 = {latitude: mcDInGilbert[0].latitude, 
+                    longitude: mcDInGilbert[0].longitude}
+    var m1 = {latitude: mcDInGilbert[1].latitude, 
+                    longitude: mcDInGilbert[1].longitude}   
+                       
+    return geolib.getDistance(m0,m1)/1000 + ' km'
 }
 
 function solution4(){
-    return 'TODO'
+    var businessesInPhoenix = _.filter(items, {city: 'Phoenix'});
+    var mcDInPhoenix = _.filter(businessesInPhoenix, {"name": "McDonald's"});
+    var latLong = _.map(mcDInPhoenix, function(d){
+        return {latitude:d.latitude, longitude:d.longitude}
+    });
+
+    var center = geolib.getCenter(latLong);
+    return "longitude:"+center.longitude+" latitude:"+center.latitude;
 }
 
 function solution5(){
-    return 'TODO'
+    var businessesInPhoenix = _.filter(items, {city: 'Phoenix'});
+    var mcDInPhoenix = _.filter(businessesInPhoenix, {"name": "McDonald's"});
+    var sBPhoenix = _.filter(businessesInPhoenix, {"name": "Starbucks"});
+    var numMcD = _.size(mcDInPhoenix);
+    var numSB = _.size(sBPhoenix);
+    if (numMcD > numSB) {
+        return "there are more McDonald's than Starbucks in Phoenix ("+numMcD+
+            " vs. "+numSB+")"
+    } else if (numMcD < numSB) {
+        return "there are more Starbucks than McDonald's in Phoenix ("+numSB+
+            " vs. "+numMcd+")"
+    } 
+return "There are an equal number of Starbucks and McDonald's in Phoenix: " + numMcd;
 }
 
 function solution6(){
-    return 'TODO'
+    var businessesInPhoenix = _.filter(items, {city: 'Phoenix'});
+    var sBPhoenix = _.filter(businessesInPhoenix, {"name": "Starbucks"});
+    var mcDInPhoenix = _.filter(businessesInPhoenix, {"name": "McDonald's"});
+    var maxObj = _.max(sBPhoenix,"review_count");
+    
+    return "The Starbucks at "+maxObj.full_address+" (id:"+maxObj.business_id+") has "+maxObj.review_count+" reviews"
 }
 
 function solution7(){
-    return 'TODO'
+    var businessesInPhoenix = _.filter(items, {city: 'Phoenix'});
+    var sBPhoenix = _.filter(businessesInPhoenix, {"name": "Starbucks"});
+    var maxObj = _.max(sBPhoenix,"review_count");
+    var locSB = {latitude: maxObj.latitude, longitude: maxObj.longitude}  
+    var mcDInPhoenix = _.filter(businessesInPhoenix, {"name": "McDonald's"});
+    var McDDistance = _.map(mcDInPhoenix, function(d){
+        var dist = geolib.getDistance(locSB,{latitude: d.latitude,  longitude: d.longitude});
+        var obj = {dist:dist, 
+                    business_id:d.business_id, 
+                    full_address:d.full_address};
+        return obj;
+    });
+    var closestObj = _.min(McDDistance, "dist");
+    return "The McDonald's at "+closestObj.full_address+" (id:"+closestObj.business_id+") is closest, at "+closestObj.dist/1000+"km";
 }
 
 function solution8(){
-    return 'TODO'
+    var businessesInPhoenix = _.filter(items, {city: 'Phoenix'});
+    var sBPhoenix = _.filter(businessesInPhoenix, {"name": "Starbucks"});
+    var maxObj = _.max(sBPhoenix,"review_count");
+    var locSB = {latitude: maxObj.latitude, longitude: maxObj.longitude}  
+    var coffeeShopPhoenix = _.filter(businessesInPhoenix, function(d){
+        return d.categories && _.includes(d.categories, "Coffee & Tea");
+    });
+    var twoKmDistance = _.filter(coffeeShopPhoenix, function(d){
+        var dist = geolib.getDistance(locSB,{latitude: d.latitude,  longitude: d.longitude});
+        return (dist <= 2000);
+    });
+   return "There are "+ _.size(twoKmDistance)+" Coffee shops within 2km"
 }
 
+// northernmost (max lat) and southernmost (min lat) McDonald's in Phoenix
 function solution9(){
-    return 'TODO'
+    var businessesInPhoenix = _.filter(items, {city: 'Phoenix'});
+    var mcDInPhoenix = _.filter(businessesInPhoenix, {"name": "McDonald's"});
+    var sorted = _.sortBy(mcDInPhoenix, "latitude");
+    var north = _.last(sorted)
+    var south = _.first(sorted)
+    return "The northern most Mcdonalds is at "+north.full_address+" (id: "+north.business_id+")  at latitude "+ north.latitude+". The southernmost is at "+south.full_address+" (id: "+south.business_id+")  at latitude "+ south.latitude+"."
 }
-
+// which McD has no startbucks w/in 5km?
 function solution10(){
-    return 'TODO'
+  var businessesInPhoenix = _.filter(items, {city: 'Phoenix'});
+    var sBPhoenix = _.filter(businessesInPhoenix, {"name": "Starbucks"});
+    var mcDInPhoenix = _.filter(businessesInPhoenix, {"name": "McDonald's"});
+    var len = _.size(sBPhoenix);
+    var mcDInPhoenixFar = _.filter(mcDInPhoenix, function(d){
+        // find a SB w/in 5km
+        closeSB = _.find(sBPhoenix,function(e){
+            var dist = geolib.getDistance(
+                {latitude: d.latitude,  longitude: d.longitude},
+                {latitude: e.latitude,  longitude: e.longitude});
+           // console.log (dist+": "+d.business_id)
+            return dist <= 5000;
+        });
+        if (_.isUndefined(closeSB)) {
+            return true;  // keep the McD's that don't have a close SB
+        }
+        return false;
+    })
+    if (_.size(mcDInPhoenixFar) == 1)
+    return "The Mcdonald's is at "+mcDInPhoenixFar[0].full_address+" (id: "+mcDInPhoenixFar[0].business_id+")";
+    else if (_.size(mcDInPhoenixFar) > 1)
+        return "There are "+_.size(mcDInPhoenixFar)+ " with no Starbucks within 5km. They are at :<br>"+ _.pluck(mcDInPhoenixFar, 'full_address').join(',<br> ')
+    return "All the McDonald's have a Starbucks within 5km"
 }
 
 function run(id, solutionFunc, data){
