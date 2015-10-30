@@ -12,7 +12,7 @@
 
 <div class="container">
 
-    <h1>Where should we build X?</h1>
+    <h1>Where should we build a 24 hour diner?</h1>
 
     <section id="candidates" class="question">
         <h4>Where are the six candidate locations?</h4>
@@ -52,57 +52,78 @@ function getCandidateLocations(){
 // Scoring Functions
 //
 
-function has_at_least_one_mcdonald_within_one_mile(loc){
+function has_at_least_one_nightlife_within_1km(loc){
 
   // get businesses within 1 mile radius
   var nearbyBusinesses = _.filter(items, function(item){
     var loc2  = _.pick(item, ['latitude', 'longitude'])
     var d = geolib.getDistance(loc, loc2)
-    return geolib.convertUnit('mi', d) < 1
+    return geolib.convertUnit('km', d) <= 1
   })
 
-  var hasAtLeastOneMcDonald = _.some(nearbyBusinesses, function (business){
-    return business.name.match(/McDonald/)
+  var hasAtLeastOne= _.some(nearbyBusinesses, function (business){
+      
+    return _.includes(business.categories,"Nightlife");
   })
+ 
 
-  return hasAtLeastOneMcDonald
+  return hasAtLeastOne
 }
 
-function has_at_least_ten_businesses_with_100_or_more_reviews_within_one_mile(loc){
+function has_no_wine_bars_within_2km(loc){
+
   // get businesses within 1 mile radius
   var nearbyBusinesses = _.filter(items, function(item){
     var loc2  = _.pick(item, ['latitude', 'longitude'])
     var d = geolib.getDistance(loc, loc2)
-    return geolib.convertUnit('mi', d) < 1
+    return geolib.convertUnit('km', d) <= 2
   })
 
-  var frequentlyReviewedBusinsses = _.filter(nearbyBusinesses, function (business){
-    return business.review_count >= 100
+  var hasAtLeastOne= _.some(nearbyBusinesses, function (business){
+      
+    return  _.includes(business.categories,"Wine Bars");
+  })
+ 
+
+  return !hasAtLeastOne
+}
+
+function has_no_juice_bars_within_1km(loc){
+
+  // get businesses within 1 mile radius
+  var nearbyBusinesses = _.filter(items, function(item){
+    var loc2  = _.pick(item, ['latitude', 'longitude'])
+    var d = geolib.getDistance(loc, loc2)
+    return geolib.convertUnit('km', d) <= 1
   })
 
-  return frequentlyReviewedBusinsses.length > 10
+  var hasAtLeastOne= _.some(nearbyBusinesses, function (business){
+      
+    return  _.some(business.categories, function(d) {
+            return d.match(/Juice/);
+        });
+    })
+  return !hasAtLeastOne
 }
 
-function has_some_feature_1(loc){
-  // TODO
-  return true
+function has_no_latenight_restaurants_within_1km(loc){
+
+  // get businesses within 1 mile radius
+  var nearbyBusinesses = _.filter(items, function(item){
+    var loc2  = _.pick(item, ['latitude', 'longitude'])
+    var d = geolib.getDistance(loc, loc2)
+    return geolib.convertUnit('km', d) <= 1
+  })
+
+  var hasAtLeastOne= _.some(nearbyBusinesses, function (business){
+      
+    //
+            return business.attributes && business.attributes["Good For"] &&   business.attributes["Good For"].latenight      
+         // });
+    })
+  return !hasAtLeastOne
 }
 
-function has_some_feature_2(loc){
-  // TODO
-  return false
-}
-
-function has_some_feature_3(loc){
-  // TODO
-  return true
-}
-
-function has_some_feature_4(loc){
-  // TODO
-  return false
-}
-// TODO: Add more scoring functions
 
 //
 // Compute a score for a location using the provided scoring function 'scoreFunc'
@@ -202,12 +223,11 @@ function loadDataThenRunSolutions(){
 
       console.log('scoring all candidate locations')
 
-      scoreAndVisualize(locs, has_at_least_one_mcdonald_within_one_mile, visualize_true_or_false)
-      scoreAndVisualize(locs, has_at_least_ten_businesses_with_100_or_more_reviews_within_one_mile, visualize_true_or_false)
-      scoreAndVisualize(locs, has_some_feature_1, visualize_true_or_false)
-      scoreAndVisualize(locs, has_some_feature_2, visualize_true_or_false)
-      scoreAndVisualize(locs, has_some_feature_3, visualize_true_or_false)
-      scoreAndVisualize(locs, has_some_feature_4, visualize_true_or_false)
+ 
+      scoreAndVisualize(locs, has_at_least_one_nightlife_within_1km, visualize_true_or_false)
+      scoreAndVisualize(locs, has_no_wine_bars_within_2km, visualize_true_or_false)
+      scoreAndVisualize(locs, has_no_latenight_restaurants_within_1km, visualize_true_or_false)
+      scoreAndVisualize(locs, has_no_juice_bars_within_1km, visualize_true_or_false)
 
    })
    .fail(function(err){
