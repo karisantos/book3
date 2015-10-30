@@ -37,7 +37,7 @@
     <div class="parallax">
       <img src="nepal.jpg">
       <h1 id="title">What are the patterns of image diffusion during the Nepal Earthquake?
-        <div class="authors">by Kari Santos, Name2, Name3, Name4</div>
+        <div class="authors">by Kari Santos, Heather Witte, Zachary Lamb, Fadhil Suhendi, Denis Kazakov</div>
       </h1>
 
     </div>
@@ -47,6 +47,15 @@
 
       <div id="questions" class="collection with-header">
           <div class="collection-header">Questions</div>
+          <section id="q1" class="question collection-item">
+              <h4>Does a user tweet in a language other than their default language? (contributed by Heather)</h4>
+              <div class="answer"></div>
+          </section>
+
+          <section id="q2" class="question collection-item">
+              <h4>What user's tweet got retweeted the most? (contributed by Zach)</h4>
+              <div class="answer"></div>
+          </section>
           <section id="qKari" class="question collection-item">
               <h4>For retweeted images, does the number of followers of the original tweet have a direct effect on the number of retweets? (contributed by Kari)</h4>
               <div class="answer"></div>
@@ -56,15 +65,13 @@
               It doesn't seem that the number of followers of the original tweet has an effect on the number of retweets.
           </section>
 
-          <section id="q2" class="question collection-item">
-              <h4>question? (contributed by ???)</h4>
+          
+
+          <section id="q3" class="question collection-item">
+              <h4>What were average retweet ratios on each day?(assumption that as days pass on, people scroll twitter less => less retweets) (contributed by Denis)</h4>
               <div class="answer"></div>
           </section>
 
-          <section id="q3" class="question collection-item">
-              <h4>question? (contributed by ???)</h4>
-              <div class="answer"></div>
-          </section>
 
           <section id="q4" class="question collection-item">
               <h4>question? (contributed by ???)</h4>
@@ -179,13 +186,45 @@ var options = {
 
     return ''
 }
+function solution1(){
 
-function solution2(){
-    return 'TODO'
+  var grouplang = _.groupBy(items, "Tweet Language")
+
+  var map = _.map(grouplang, function(v,k){
+        return {"language": k, "count": v.length}
+    })
+
+  return "From the dataset of " + items.length + " tweets, there were " + map[0].count + " tweets in " + map[0].language + " and " + map[1].count + " tweets in " + map[1].language + "."
 }
 
+function solution2(){
+    var allUsers = _.groupBy(items, 'Original User Name')
+    var sumOfTweets =_.mapValues(allUsers, function(d){
+    return d.length
+})
+    // console.log(sumOfTweets)
+  sorted = _.sortByOrder(_.pairs(sumOfTweets),function(d){return d[1]},'desc')
+  topTen = _.take(sorted,10)
+  result = _.object(topTen)
+  console.log(topTen)
+    return topTen
+}
+
+
 function solution3(){
-    return 'TODO'
+    retweets = _.filter(items, function(n){
+      return n.Rt == "Retweet"
+    })
+    retweetDates = _.groupBy(retweets, function(d){
+      return d["* Tweet Created At"].match(/\/[0-9]*\//)
+    })
+    dates = _.groupBy(items, function(d){
+      return d["* Tweet Created At"].match(/\/[0-9]*\//)
+    })
+    return _.map(retweetDates, function(group,key){
+      return  key + ": " + group.length/dates[key].length  + ', <br>'
+    })
+    //* Tweet Created At -> each day, divide # of retweets by size of group
 }
 
 function solution4(){
@@ -215,6 +254,7 @@ function loadDataThenRunSolutions(){
         console.log('first item', items[0])
 
        run('#qKari', solutionKari, items)
+       run('#q1', solution1, items)
        run('#q2', solution2, items)
        run('#q3', solution3, items)
        run('#q4', solution4, items)
