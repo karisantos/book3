@@ -151,22 +151,20 @@ You don't want to be that close to other restaurants that are known to be good f
 
 	After drinking, people may want to get something to eat.
 
-17. Are there dry cleaning/laundry businesses within 2 kilometers?
+17. Is there any restaurants with 3 stars or less within 2 kilometers ? contributed by (Fadhil Suhendi)
 
-	When people do their laundry late at night, they may get hungry.
+You don’t want highly-rated competition nearby.
 
-18. Are there elementary/high schools within 2 kilometers? 
+18. Are there any dry/cleaning or laundry businesses within 2 kilometers ? contributed by (Fadhil Suhendi)
 
-19. Do establishments within 2 kilometers require formal attire? 
+When people do their laundry late at night, they may get hungry
 
-20. Are there a lot of nightlife establishments nearby?
-	
-	You want to be near the night-life of the city.
+19. Are there any religious organization within 2 kilometers ? contributed by (fadhil suhendi)
 
-21. Are there dive bars within 2 kilometers?
+There are many people who have late night prayer
 
-22. Are there religious organizations within 2 kilometers?
-
+20. Are there any libraries within 2 kilometers ? contributed by (fadhil suhendi) 
+Some people might get hungry after studying
 
 
 ### Conclusion
@@ -193,9 +191,9 @@ Q13|no|no|no|no|no|no
 Q14|no|no|no|no|no|no
 Q15|no|no|no|no|no|no
 Q16|no|no|no|no|no|no
-Q17|no|no|no|no|no|no
-Q18|no|no|no|no|no|no
-Q19|no|no|no|no|no|no
-Q20|no|no|no|no|no|no
-TOTALS|1|1|2|3|3|3
+Q17|yes|yes|yes|no|no|no
+Q18|yes|yes|yes|no|no|yes
+Q19|yes|yes|yes|yes|no|yes
+Q20|yes|yes|yes|yes|yes|yes
+TOTALS|5|5|6|5|4|6
 
