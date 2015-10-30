@@ -15,7 +15,7 @@
     <h1>Where should we build X?</h1>
 
     <section id="candidates" class="question">
-        <h4>Where are the six candidate locations?</h4>
+        <h4>Where are the candidate locations?</h4>
         <div class="map"></div>
     </section>
 
@@ -52,37 +52,6 @@ function getCandidateLocations(){
 // Scoring Functions
 //
 
-function has_at_least_one_mcdonald_within_one_mile(loc){
-
-  // get businesses within 1 mile radius
-  var nearbyBusinesses = _.filter(items, function(item){
-    var loc2  = _.pick(item, ['latitude', 'longitude'])
-    var d = geolib.getDistance(loc, loc2)
-    return geolib.convertUnit('mi', d) < 1
-  })
-
-  var hasAtLeastOneMcDonald = _.some(nearbyBusinesses, function (business){
-    return business.name.match(/McDonald/)
-  })
-
-  return hasAtLeastOneMcDonald
-}
-
-function has_at_least_ten_businesses_with_100_or_more_reviews_within_one_mile(loc){
-  // get businesses within 1 mile radius
-  var nearbyBusinesses = _.filter(items, function(item){
-    var loc2  = _.pick(item, ['latitude', 'longitude'])
-    var d = geolib.getDistance(loc, loc2)
-    return geolib.convertUnit('mi', d) < 1
-  })
-
-  var frequentlyReviewedBusinsses = _.filter(nearbyBusinesses, function (business){
-    return business.review_count >= 100
-  })
-
-  return frequentlyReviewedBusinsses.length > 10
-}
-
 function has_some_feature_1(loc){
   // TODO
   return true
@@ -102,7 +71,11 @@ function has_some_feature_4(loc){
   // TODO
   return false
 }
-// TODO: Add more scoring functions
+
+function has_some_feature_5(loc){
+  // TODO
+  return false
+}
 
 //
 // Compute a score for a location using the provided scoring function 'scoreFunc'
@@ -202,12 +175,11 @@ function loadDataThenRunSolutions(){
 
       console.log('scoring all candidate locations')
 
-      scoreAndVisualize(locs, has_at_least_one_mcdonald_within_one_mile, visualize_true_or_false)
-      scoreAndVisualize(locs, has_at_least_ten_businesses_with_100_or_more_reviews_within_one_mile, visualize_true_or_false)
       scoreAndVisualize(locs, has_some_feature_1, visualize_true_or_false)
       scoreAndVisualize(locs, has_some_feature_2, visualize_true_or_false)
       scoreAndVisualize(locs, has_some_feature_3, visualize_true_or_false)
       scoreAndVisualize(locs, has_some_feature_4, visualize_true_or_false)
+      scoreAndVisualize(locs, has_some_feature_5, visualize_true_or_false)
 
    })
    .fail(function(err){

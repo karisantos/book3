@@ -30,7 +30,7 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.9.4/chartist.min.css"></head>
+</head>
 <body>
 
   <div class="parallax-container">
@@ -47,13 +47,9 @@
 
       <div id="questions" class="collection with-header">
           <div class="collection-header">Questions</div>
-          <section id="qKari" class="question collection-item">
-              <h4>For retweeted images, does the number of followers of the original tweet have a direct effect on the number of retweets? (contributed by Kari)</h4>
+          <section id="q1" class="question collection-item">
+              <h4>question? (contributed by ???)</h4>
               <div class="answer"></div>
-              <div class="ct-chart ct-octave" id="chartKari"></div>
-              X axis = number of followers<br>
-              Y axis = retweet count<br>
-              It doesn't seem that the number of followers of the original tweet has an effect on the number of retweets.
           </section>
 
           <section id="q2" class="question collection-item">
@@ -107,7 +103,6 @@ Discuss some findings
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.9.4/chartist.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
@@ -115,69 +110,8 @@ Discuss some findings
 
 var items   // global scope (i.e., can be accessed in javascript console)
 
-function getRetweetCounts(data){
-    var original =  _.filter(data, function(d){
-        return ( d["Rt"] == "Original Tweet (probably)"
-            && _.startsWith(d["* Tweet Created At"],"4/26/15 "))
-        });
-
-
-    // there is at least one Image Id Str (592285978557075500)that shows up in 2
-    // different original tweets, so run this through uniq
-
-    original = _.uniq(original,function(d){
-        return d["Image Id Str"];
-    })
-
-    
-    var retweet =  _.filter(data, function(d){
-        return ( d["Rt"] == "Retweet")
-        })
-    var groups = _.groupBy(retweet,"Image Id Str")
-    
-    var size = _.size(groups);
-    var counts = _.map(original, function(d){
-        var count = _.size(groups[d["Image Id Str"]]);
-        var obj = {ID:d["Image Id Str"], count:count}
-        obj.followers = d["User Followers Count"];
-        return obj;
-    })
-    return counts;
-}
-
-function solutionKari(){
-    counts =  getRetweetCounts(items)
-    counts = _.sortBy(counts, "followers");
-    var noZero = _.filter(counts, function(d){
-      return d.count > 0;
-    })
-    // var noZero = counts;
-    countArr = _.pluck(noZero,"count");
-    followerArr = _.pluck(noZero,"followers")
-var options = {
-  showLine: false,
-  
-  axisX: {
-    // // scaleMinSpace: 100 not supported for x axis
-      labelInterpolationFnc: function(value, index) {
-        return index % 5 === 0 ? value : null;
-      }
-    //divisor: 8,
-    },
-  axisY:{
-    onlyInteger: true,
-    //scaleMinSpace: 100
-  }
-};
-
-    new Chartist.Line('#chartKari', {
-      labels: followerArr,
-      series: [countArr]
-    //labels: [1, 2, 3, 4],
-    //series: [[100, 120, 180, 200]]
-  }, options);
-
-    return ''
+function solution1(){
+    return 'TODO'
 }
 
 function solution2(){
@@ -214,7 +148,7 @@ function loadDataThenRunSolutions(){
         console.log('number of items loaded:', items.length)
         console.log('first item', items[0])
 
-       run('#qKari', solutionKari, items)
+       run('#q1', solution1, items)
        run('#q2', solution2, items)
        run('#q3', solution3, items)
        run('#q4', solution4, items)
