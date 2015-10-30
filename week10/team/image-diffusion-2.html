@@ -57,12 +57,12 @@
               <div class="answer"></div>
           </section>
           <section id="qKari" class="question collection-item">
-              <h4>For retweeted images, does the number of followers of the original tweet have a direct effect on the number of retweets? (contributed by Kari)</h4>
+              <h4>For retweeted images, does the number of followers of the original tweeter have a direct effect on the number of retweets? (contributed by Kari)</h4>
               <div class="answer"></div>
               <div class="ct-chart ct-octave" id="chartKari"></div>
               X axis = number of followers<br>
               Y axis = retweet count<br>
-              It doesn't seem that the number of followers of the original tweet has an effect on the number of retweets.
+              It doesn't seem that the number of followers of the original tweeter has an effect on the number of retweets.
           </section>
 
           
@@ -74,19 +74,11 @@
 
 
           <section id="q4" class="question collection-item">
-              <h4>question? (contributed by ???)</h4>
+              <h4>How many original tweet in location Kathmandu, Nepal? (Fadhil Suhendi)</h4>
               <div class="answer"></div>
           </section>
 
-          <section id="q5" class="question collection-item">
-              <h4>question? (contributed by ???)</h4>
-              <div class="answer"></div>
-          </section>
 
-          <section id="q6" class="question collection-item">
-              <h4>question? (contributed by ???)</h4>
-              <div class="answer"></div>
-          </section>
       </div>
 
   </div>
@@ -103,11 +95,11 @@
 
 # Discussion
 
-Discuss some findings
+The answers submitted here probably cause more additional questions to be raised than full answers. For instance, what causes a tweet with an image to be retweeted? Is it the "interest" of the image? It doesn't seem to correlate with the number of followers of the original tweeter, but what if you looked at the follower count of the retweeters? If a tweet is retweeted by someone with a large following at any time in the retweet path, perhaps that's what makes it go viral. Do tweets with comments in less popular languages have less of a chance of going viral?  What is the typical "lifecycle" of a tweet and are there common patterns? How quickly to tweets leave the location of a disaster?
 
-# Heading 2
+More tweet data over a longer duration and a second round of analysis would prove very interesting.
 
-Discuss some findings
+
 
     </div>
   </div>
@@ -228,16 +220,32 @@ function solution3(){
 }
 
 function solution4(){
-    return 'TODO'
+
+    // user location with the number of original tweets
+
+    var man = _.filter(items,function(n){
+      return n['User Location'] == "Kathmandu, Nepal"
+    })
+
+
+    var location = _.groupBy(man,function(n){
+      return n['User Location']
+    })
+
+    
+    var tweet = _.mapValues(location,function(n){
+      return _.filter(n,function(d){
+        return d['Rt'] == "Original Tweet (probably)" 
+      }).length
+
+    })
+
+    console.log(tweet)
+    
+    return "There are " + _.values(tweet) + " original tweets in Kathmandu, Nepal"
 }
 
-function solution5(){
-    return 'TODO'
-}
 
-function solution6(){
-    return 'TODO'
-}
 
 function run(id, solutionFunc, data){
     console.log('run solution for ' + id)
@@ -258,8 +266,6 @@ function loadDataThenRunSolutions(){
        run('#q2', solution2, items)
        run('#q3', solution3, items)
        run('#q4', solution4, items)
-       run('#q5', solution5, items)
-       run('#q6', solution6, items)
      })
      .fail(function(err){
          console.error(err)
