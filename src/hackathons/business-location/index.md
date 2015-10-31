@@ -90,34 +90,25 @@ You don't want to be that close to other restaurants that are known to be good f
 	
 	People that go to juice bars don't go to diners!
 
-1. Are there other 24-hour diners located within 2 kilometers?  (Zach)
-
-  You don't want to be too close to another 24-hour restaurant
 
 
-1. Are there any clubs within 2 kilometers? 
+5. Are there any movie theaters within 2 kilometers? (no movie theaters)
 
-  You want to be near the night-life of the city.
+You want to be near the night-life of the city.
 
-4. Are there any bars within 2 kilometers?
+6. Are there any 3-star -or-less establishments within 2 kilometers?
 
-	You want to be near the night-life of the city.
+You don’t want highly-rated competition nearby.
 
-5. Are there any music venues within 2 kilometers?
+7. Are there any colleges/universities within 2 kilometers?
 
-	You want to be near the night-life of the city.
+College students are up late at night.
 
-6. Are there any movie theaters within 2 kilometers? (no movie theaters)
+8. Are there hotels within 2 kilometers?
 
-	You want to be near the night-life of the city.
+People vising Phoenix from out of town may want something to eat when they arrive to/leave town late at night.
 
-7. Are there any 3-star -or-less establishments within 2 kilometers?
 
-	You don't want highly-rated competition nearby. 
-
-8. Are there any low price-range (1) restaurants within 2 kilometers? (Heather)
-	
-	Diners are inexpensive establishments, so you want to be near other inexpensive establishments
 
 9. Are there any thrift stores within 2 kilometers?
 
@@ -169,9 +160,9 @@ Some people might get hungry after studying
 
 ### Conclusion
 
-Our team collectively has implemented (N) scoring functions. Based on
-the scores, our team recommends location (1, 2, 3, 4, 5, or 6 from west to east),
-because it receives (m) out of (N) possible scores.
+Our team collectively has implemented 20 scoring functions. Based on
+the scores, our team recommends location (3,1,2,6,4,5 from west to east),
+because it receives (10) out of (12) possible scores.
 
 Question|Site 1|Site 2|Site 3|Site 4|Site 5|Site 6
 --------|------|------|------|------|------|------
@@ -179,10 +170,10 @@ Q1|yes|yes|no|no|no|no
 Q2|no|no|no|yes|yes|yes
 Q3|no|no|yes|yes|yes|yes
 Q4|no|no|yes|yes|yes|yes
-Q5|no|no|no|no|no|no
-Q6|no|no|no|no|no|no
-Q7|no|no|no|no|no|no
-Q8|no|no|no|no|no|no
+Q5|no|no|yes|yes|yes|yes
+Q6|yes|yes|yes|no|no|no
+Q7|yes|yes|yes|no|no|no
+Q8|yes|yes|yes|yes|yes|yes
 Q9|no|no|no|no|no|no
 Q10|no|no|no|no|no|no
 Q11|no|no|no|no|no|no
@@ -195,5 +186,5 @@ Q17|yes|yes|yes|no|no|no
 Q18|yes|yes|yes|no|no|yes
 Q19|yes|yes|yes|yes|no|yes
 Q20|yes|yes|yes|yes|yes|yes
-TOTALS|5|5|6|5|4|6
+TOTALS|8|8|10|7|6|8
 
