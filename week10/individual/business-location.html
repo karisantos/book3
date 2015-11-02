@@ -12,8 +12,7 @@
 
 <div class="container">
 
-    <h1>Where should we build X?</h1>
-
+    <h1>Where should we build a Yoga Studio?</h1>
     <section id="candidates" class="question">
         <h4>Where are the candidate locations?</h4>
         <div class="map"></div>
@@ -23,6 +22,7 @@
     <section id="features">
     </section>
 
+<section id="XX"><div class="answer"></div>
 </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
@@ -36,61 +36,136 @@
 // Candidate Locations
 //
 
-function getCandidateLocations(){
+// lat long phoenix is 33.45, -112.06
+function getCandidateLocations(numLat,numLong){
+  // center grid around Phoenix center
   var locations = []
-  locations.push({latitude: 33.45, longitude: -112.03})
-  locations.push({latitude: 33.45, longitude: -112.04})
-  locations.push({latitude: 33.45, longitude: -112.05})
-  locations.push({latitude: 33.45, longitude: -112.06})
-  locations.push({latitude: 33.45, longitude: -112.07})
-  locations.push({latitude: 33.45, longitude: -112.08})
+  var delta = .01
+  for (i = 0; i < numLat; i++){
+    lat = 33.45 + (i- numLat/2)* delta;
+    for (j = 0; j < numLong; j++){
+      lon = -112.06 + (j- numLong/2)* delta;
+      locations.push({latitude: lat, longitude: lon})
+    }
+  }
+
+  // locations.push({latitude: 33.45, longitude: -112.03})
+  // locations.push({latitude: 33.45, longitude: -112.04})
+  // locations.push({latitude: 33.45, longitude: -112.05})
+  // locations.push({latitude: 33.45, longitude: -112.06})
+  // locations.push({latitude: 33.45, longitude: -112.07})
+  // locations.push({latitude: 33.45, longitude: -112.08})
   return locations
 }
+// holds nearby Businesses w/ keys lat, long, distKm
+var nearbyBiz = [];
+function getNearbyBusinesses(loc, distKm) {
+  // has this combo of lat/long and distKm been colelcted before? if so, return it
+  prevRes = _.filter(nearbyBiz, function(d) {
+      return (d.latitude == loc.latitude && d.longitude == loc.longitude && d.distKm == distKm) 
+  });
 
+  if (prevRes.length > 0) {
+    return prevRes[0].nearbyBusinesses;
+  } 
+  var nearbyBusinesses = _.filter(items, function(item){
+    var loc2  = _.pick(item, ['latitude', 'longitude'])
+    var d = geolib.getDistance(loc, loc2)
+    return geolib.convertUnit('km', d) <= distKm
+  })
+var obj = {};
+  obj.latitude = loc.latitude;
+  obj.longitude = loc.longitude
+  obj.distKm = distKm
+  obj.nearbyBusinesses = nearbyBusinesses;
+  
+  nearbyBiz.push(obj);
+
+  return nearbyBusinesses;
+}
+  
+  
 
 //
 // Scoring Functions
 //
 
-function has_some_feature_1(loc){
+// yoga studios = has ["Active Life", "Yoga", "Fitness & Instruction"], but doesn't have Category "Gyms" or "Physical Trainers"
+function has_no_yoga_studios_within_2km(loc){
   // TODO
-  return true
+  var nearbyBusinesses = getNearbyBusinesses(loc, 2);
+  var hasAtLeastOne= _.some(nearbyBusinesses, function (business){
+      
+    return _.includes(business.categories,"Yoga") 
+        && _.includes(business.categories,"Active Life") 
+        && _.includes(business.categories,"Fitness \u0026 Instruction")
+        && !_.includes(business.categories,"Gyms") 
+        && !_.includes(business.categories,"Physical Trainers") 
+
+
+  })
+  return !hasAtLeastOne
 }
 
-function has_some_feature_2(loc){
-  // TODO
-  return false
+function has_coffee_tea_house_within_500m(loc){
+  var nearbyBusinesses = getNearbyBusinesses(loc, .5);
+  var hasAtLeastOne= _.some(nearbyBusinesses, function (business){
+      
+    return _.includes(business.categories,"Coffee \u0026 Tea") 
+  })
+  return hasAtLeastOne
+}
+// there's a business w/
+// attributes.parking.garage or attributes.parking.lot is true
+// very close by
+function has_trendy_witihin_1k(loc){
+ var nearbyBusinesses = getNearbyBusinesses(loc, 1);
+  var hasAtLeastOne= _.some(nearbyBusinesses, function (business){
+      
+    return business.attributes && business.attributes.Ambience
+          && business.attributes.Ambience.trendy 
+  })
+  return hasAtLeastOne
 }
 
-function has_some_feature_3(loc){
-  // TODO
-  return true
+// review count and star "Health Markets"
+function has_popular_Health_Market_witihin_1km(loc){
+  var nearbyBusinesses = getNearbyBusinesses(loc, 1);
+  var hasAtLeastOne= _.some(nearbyBusinesses, function (business){
+    return _.includes(business.categories,"Health Markets") && business.stars > 3 && business.review_count >= 5
+  })
+  return hasAtLeastOne
 }
-
-function has_some_feature_4(loc){
-  // TODO
-  return false
-}
-
-function has_some_feature_5(loc){
-  // TODO
-  return false
+// vegan "Vegetarian" in categories
+function has_vegetarian_restaurant_within_2km(loc){
+   var nearbyBusinesses = getNearbyBusinesses(loc, 2);
+  var hasAtLeastOne= _.some(nearbyBusinesses, function (business){
+      
+    return _.includes(business.categories,"Vegetarian") && business.stars > 3 && business.review_count >= 5
+  })
+  return hasAtLeastOne
 }
 
 //
 // Compute a score for a location using the provided scoring function 'scoreFunc'
 // and visualization function 'vizFunc'
 //
+
+
+// temp make mapElement global
+var mapElement;
 function scoreAndVisualize(locs, scoreFunc, vizFunc){
+  var title = _.startCase(scoreFunc.name)
+  var section = $('<section><h4>' + title + '</h4><div class="map"></div></section>').appendTo('#features')
+  mapElement = $(section).find('.map')[0]
 
   console.time('scoring ' + scoreFunc.name)
   var scores = _.map(locs, scoreFunc)
   console.timeEnd('scoring ' + scoreFunc.name)
 
-  var title = _.startCase(scoreFunc.name)
-  var section = $('<section><h4>' + title + '</h4><div class="map"></div></section>').appendTo('#features')
-  var mapElement = $(section).find('.map')[0]
+  
   vizFunc(mapElement, locs, scores)
+  return scores;
 }
 
 //
@@ -112,7 +187,7 @@ function visualize(domElement, locs){
 
     _.forEach(locs, function(loc){
       var latlng = [loc.latitude, loc.longitude]
-      var circle = L.circle(latlng, 10, {
+      var circle = L.circle(latlng, 50, {
           color: 'red',
           fillColor: '#f03',
           fillOpacity: 0.5
@@ -155,8 +230,9 @@ function visualize_true_or_false(domElement, locs, scores){
 
 var items = []
 function loadDataThenRunSolutions(){
-
-  var locs = getCandidateLocations()
+  var numLat = 5
+  var numLong = 9;
+  var locs = getCandidateLocations(numLat,numLong)
   visualize($('#candidates .map')[0], locs)
 
   $.get({url: 'http://bigdatahci2015.github.io/data/yelp/yelp_academic_dataset_business.phoenix.json.lines.txt'})
@@ -168,18 +244,59 @@ function loadDataThenRunSolutions(){
 
       // take only the last 2000 to speed up computation
       // TODO: comment this out before the final submission
-      items = _.takeRight(items, 2000)
+      //items = _.takeRight(items, 2000)
 
       console.log('number of items loaded:', items.length)
       console.log('first item:', items[0])
 
       console.log('scoring all candidate locations')
 
-      scoreAndVisualize(locs, has_some_feature_1, visualize_true_or_false)
-      scoreAndVisualize(locs, has_some_feature_2, visualize_true_or_false)
-      scoreAndVisualize(locs, has_some_feature_3, visualize_true_or_false)
-      scoreAndVisualize(locs, has_some_feature_4, visualize_true_or_false)
-      scoreAndVisualize(locs, has_some_feature_5, visualize_true_or_false)
+      var score = scoreAndVisualize(locs, has_no_yoga_studios_within_2km, visualize_true_or_false)
+      var scoreSum = _.map(score, function(d){
+        if (d) return 1;
+        return 0;
+      })
+
+      score = scoreAndVisualize(locs, has_coffee_tea_house_within_500m, visualize_true_or_false)
+      scoreSum = _.map(score, function(d,index){
+        if (d) return scoreSum[index]+1;
+        return scoreSum[index];
+      })
+      score = scoreAndVisualize(locs, has_trendy_witihin_1k, visualize_true_or_false)
+      scoreSum = _.map(score, function(d,index){
+        if (d) return scoreSum[index]+1;
+        return scoreSum[index];
+      })
+      score = scoreAndVisualize(locs, has_popular_Health_Market_witihin_1km, visualize_true_or_false)
+      scoreSum = _.map(score, function(d,index){
+        if (d) return scoreSum[index]+1;
+        return scoreSum[index];
+      })
+      score = scoreAndVisualize(locs, has_vegetarian_restaurant_within_2km, visualize_true_or_false)
+      scoreSum = _.map(score, function(d,index){
+        if (d) return scoreSum[index]+1;
+        return scoreSum[index];
+      })
+
+  // create list of top locations
+  var locScore = _.map(scoreSum, function(d,index){
+    return {latitude:locs[index].latitude, longitude:locs[index].longitude,
+              score:d}
+  })
+  locScore = _.sortByOrder(locScore,"score","desc");
+  var numLoc = numLat*numLong;
+  var numTopScores = 6;
+  if (numLoc > numTopScores) {
+    locScore = _.slice(locScore,0,numTopScores)
+  } else numTopScores = numLoc;
+
+
+var answer = "</br>The top "+numTopScores+" locations are:</br> ";
+_.forEach(locScore, function(d){
+  answer += "latitude:"+_.round(d.latitude,2)+" longitude: "
+      +_.round(d.longitude,2)+ " score: "+d.score+"</br>"
+});
+$('#XX').find('.answer').html(answer)
 
    })
    .fail(function(err){
