@@ -1,0 +1,151 @@
+<html>
+<head>
+    <style>
+        .answer {
+            min-height: 50px
+        }
+    </style>
+    <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Pokemon</h1>
+
+    <section id="q1" class="question">
+        <h4>How many pokemons?</h4>
+        <div class="answer"></div>
+    </section>
+
+    
+</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+    <script>
+
+function solution1(data){
+
+    items_old = _.sortBy(items_old, "REC")
+    items_new = _.sortBy(items_new, "REC")
+
+    unchanged = _.filter(items_new,function(d){
+        return _.some(items_old, d)
+    })
+
+    changed_new = _.filter(items_new,function(d){
+        return !_.some(items_old, d)
+    })
+    cn_list = _.map(changed_new ,function(d){
+        old = _.find(items_old,d.REC)
+        var obj = {}
+        obj.newO = d
+        obj.oldO = old
+        return obj;
+    })
+    removed =  _.filter(items_old,function(d){
+        return !_.some(items_new, d)
+    })
+    matchREC = _.filter(items_new,function(d){
+        return _.some(items_old, 'REC', d.REC)
+    })
+
+    oldRECnotInNew = _.filter(items_old,function(d){
+        return !_.some(items_new, 'REC', d.REC)
+    })
+    newRECnotInOld = _.filter(items_new,function(d){
+        return !_.some(items_old, 'REC', d.REC)
+    })
+    changed = _.filter(changed_new,function(d){
+            return _.some(items_old, function(e){
+                if ( e.REC == d.REC ) {
+                    if (e != d)
+                     return true
+                    else return false
+                }
+                return false;
+            })
+      
+    })
+
+    oldNo = _.filter(items_old, 'DIRECTORY',"No")
+    newNo = _.filter(items_new, 'DIRECTORY',"No")
+    newRECNo = _.filter(newRECnotInOld, 'DIRECTORY',"No")
+    newRECYes = _.filter(newRECnotInOld, 'DIRECTORY',"Yes")
+    var result = "-----<br>";
+    _.forEach(newRECYes, function(d) {
+        result+= d.EMAIL+"</br>"
+    })
+    result+="----------<br>"
+    return result
+}
+
+function solution2(data){
+    return _.sum(_.pluck(data, 'Attack')) / data.length
+}
+
+function solution3(data){
+    return _.pluck(data, 'Name').join(', ')
+}
+
+function solution4(data){
+   return  _.max(data,'Attack').Name;
+   
+}
+
+function solution5(data){
+    return _.pluck(_.filter(data,function(d){
+        return d.Type == "GRASS";
+        }),'Name').join(', ')
+   
+}
+
+function run(id, solutionFunc, data){
+    console.log('run solution for ' + id)
+    var answer = solutionFunc(data)
+    $(id).find('.answer').html(answer)
+}
+
+var items_old = []
+var items_new = []
+function loadDataThenRunSolutions(){
+    $.get({url: '/data/sortedreg2015-08-19.json'})
+     .done(function(data){
+         console.log('got data', data)
+       // var lines = data.trim().split('\n')
+
+      // convert text lines to json arrays and save them in `items`
+        items_old = data;
+
+        $.get({url: '/data/sortedreg2015-08-31.json'})
+             .done(function(data){
+                 console.log('got data', data)
+                //var lines = data.trim().split('\n')
+
+              // convert text lines to json arrays and save them in `items`
+                //items_new = _.map(lines, JSON.parse)
+                items_new = data;
+                run('#q1', solution1, data)
+                 // run('#q2', solution2, data)
+                 // run('#q3', solution3, data)
+                 // run('#q4', solution4, data)
+                 // run('#q5', solution5, data)
+             })
+             .fail(function(err){
+                 console.error(err)
+             })
+         })
+         .fail(function(err){
+             console.error(err)
+         })
+}
+
+loadDataThenRunSolutions()
+
+    </script>
+
+</body>
+</html>
