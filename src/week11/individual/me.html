@@ -57,18 +57,19 @@
   <script>
 
 // TODO: replace the FIREBAW_URL with your own
-var PERSONAL_FIREBASE_URL = 'https://doubleshow-bigdata-hci.firebaseio.com/'
+var PERSONAL_FIREBASE_URL = 'https://karisantos-bigdata-hci.firebaseio.com/'
 
 // add the personal firebase url to the class's firebase
 
 // load events from the personal firebase
 var personal_firebase = new Firebase(PERSONAL_FIREBASE_URL)
 personal_firebase
-  .child('events')
+  .child('events/')
   .on('value', function(snapshot){
     var events = snapshot.val()
     analyze(events)
 })
+
 
 function ask(func, events){
   var answer = func(events)
@@ -85,67 +86,161 @@ function ask(func, events){
 
 function analyze(events){
   console.log(events)
-
-  ask(when_did_i_start_collecting, events)
+  events = addUnixTime(events)
+  ask(when_did_i_start_collecting_emails, events)
   ask(how_many_emails_have_i_received_since, events)
-  ask(question1, events)
-  ask(question2, events)
-  ask(question3, events)
-  ask(question4, events)
-  ask(question5, events)
-  ask(question6, events)
-  ask(question7, events)
-  ask(question8, events)
-  ask(question9, events)
-  ask(question10, events)
+  ask(what_is_the_most_recent_email, events)
+  ask(did_anyone_post_to_slack_in_last_4_hours, events)
+  ask(what_is_most_recent_calendar_event, events)
+  ask(how_many_evernote_notes, events)
+  ask(how_many_total_events, events)
+  ask(which_activity_has_most_events, events)
+  ask(from_where_is_the_most_recent_event, events)
+  ask(how_many_emails_in_past_hour, events)
+  ask(do_I_have_more_slack_or_evernote_events, events)
+  ask(who_wrote_the_latest_slack, events)
+}
+// not working!!
+function addUnixTime(events) {
+
+  events.gmail = _.mapValues(events.gmail, function(d){
+    var time = moment(d.Date,"ddd DD MMM YYYY HH:mm:ss ZZ")
+    var x = time.format("dddd MMMM Do YYYY h:mm:ss a"); 
+    d.unixTime = time.unix()*1000;
+    // console.log(d.Date+'-> '+x+'='+d.unixTime)
+    return d
+  })
+  events.slack = _.mapValues(events.slack, function(d){
+    var time = _.words(d.timestamp,/[^.]+/)
+    d.unixTime = parseInt(time[0])*1000
+    return d
+  })
+  events.calendar = _.mapValues(events.calendar, function(d){
+    var date = new moment(d.time, "MMM DD, YYYY hh:mma")
+    d.unixTime = date.unix();
+    return d;
+  })
+   // evernote already has unix time
+
+  return events;
 }
 
-function when_did_i_start_collecting(events){
-  return 'I started collecting from [TODO: earliest timestamp].'
+function when_did_i_start_collecting_emails(events){
+  var minObj = _.min(events.gmail,function(d) {
+    var date = new Date(d.Date)
+    return date
+  });
+var minObj2 = _.min(events.gmail,'unixTime')
+  return 'I started collecting from '+ minObj.Date;
 }
 
 function how_many_emails_have_i_received_since(events){
   return 'I received ' + _.values(events.gmail).length + ' emails.'
 }
 
-function question1(events){
-  return 'I ...'
+function what_is_the_most_recent_email(events){
+  var maxObj = _.max(events.gmail,function(d) {
+    var date = new Date(d.Date)
+    return date
+  });
+
+
+  return 'The latest email was '+ maxObj.Date;
 }
 
-function question2(events){
-  return 'I ...'
+function did_anyone_post_to_slack_in_last_4_hours(events){
+  var last4Hours = _.filter(events.slack,function(d) {
+    // timestamp is 'NNNNNN.NNNNNN' (string holding a float)
+    // let's just use seconds
+    var sec = parseInt(_.words(d.timestamp,/[^.]+/)[0])
+    var ts =  moment(sec*1000)
+    var fourHoursAgo = moment().subtract(4,'hours')
+
+    return ts.isAfter(fourHoursAgo)
+  });
+
+  var strStart = "No one has "
+  if (last4Hours.length == 1) strStart = "1 user has " 
+  else if (last4Hours.length > 1) strStart = last4Hours.length+' users have ' 
+
+  return strStart+'posted to my slack in last 4 hours'
 }
 
-function question3(events){
-  return 'I ...'
+function what_is_most_recent_calendar_event(events){
+  var mostRecent = _.max(events.calendar,function(d) {
+    var date = new moment(d.time, "MMM DD, YYYY hh:mma")
+    var x = date.unix();
+    console.log(x+''+d.time+' '+d.title)
+
+    return date.unix(); // seconds from epoch
+  });
+
+  return 'My most recent calendar event was "'+mostRecent.title+'" at '+mostRecent.time
 }
 
-function question4(events){
-  return 'I ...'
+function how_many_evernote_notes(events){
+   return 'I have  ' + _.values(events.evernote).length + ' new notes in Evernote.'
+  
 }
 
-function question5(events){
-  return 'I ...'
+function how_many_total_events(events){
+  var eventArray = _.pairs(events)
+  var total = _.sum(eventArray, function(d){
+        var x =  _.values(d[1]).length;
+        return x;
+
+  })
+  return 'I have had  ' + total + " events."
 }
 
-function question6(events){
-  return 'I ...'
+function which_activity_has_most_events(events){
+  var eventArray = _.pairs(events)
+  var maxObj = _.max(eventArray, function(d){
+        var x =  _.values(d[1]).length;
+        return x;
+
+  })
+  return 'My activity with most events is ' + maxObj[0]
 }
 
-function question7(events){
-  return 'I ...'
+function from_where_is_the_most_recent_event(events){
+  // most recent event
+  var pairs = _.pairs(events)
+  var mostMax = _.max(pairs, function(e){
+    var maxObj = _.max(e[1],'unixTime');
+    return maxObj.unixTime;
+  });
+
+  return 'The most recent event was from ' + mostMax[0]
 }
 
-function question8(events){
-  return 'I ...'
+function how_many_emails_in_past_hour(events){
+  // what hour do I receive most emails 
+  var lastHour = _.filter(events.gmail,function(d) {
+    // timestamp is 'NNNNNN.NNNNNN' (string holding a float)
+    // let's just use seconds
+    var time =  moment(d.unixTime)
+    var oneHourAgo = moment().subtract(1,'hours')
+
+    return time.isAfter(oneHourAgo)
+  });
+
+  
+  return 'I received '+_.size(lastHour)+' emails in the past hour'
 }
 
-function question9(events){
-  return 'I ...'
+function do_I_have_more_slack_or_evernote_events(events){
+  if (_.values(events.slack).length > _.values(events.evernote).length) return 'I have more slack activity'
+  if (_.values(events.slack).length < _.values(events.evernote).length) return 'I have more evernote activity'
+  return 'I have equal activity between slack and evernote'
 }
 
-function question10(events){
-  return 'I ...'
+function who_wrote_the_latest_slack(events){
+  var mostRecent = _.max(events.slack,'unixTime')
+
+
+  return mostRecent.user+' wrote the most recent slack post'
+  
 }
 
 // initialize the parallax effect
