@@ -57,6 +57,7 @@
   <script>
 
 // TODO: replace the FIREBAW_URL with your own
+// Kari - do I need to do anything??
 var CLASS_FORKS = 'https://big-data-hci-hackathon.firebaseio.com/book3/forks'
 
 // add the personal firebase url to the class's firebase
@@ -121,14 +122,14 @@ function analyze(events){
 
   ask(how_many_individuals_analyzed_so_far, events)
   ask(whose_data_is_available, events)
-  ask(question1, events)
-  ask(question2, events)
-  ask(question3, events)
-  ask(question4, events)
-  ask(question5, events)
-  ask(question6, events)
-  ask(question7, events)
-  ask(question8, events)
+  ask(ok_but_who_did_it_right, events)
+  ask(where_are_events_from, events)
+  ask(how_many_gmails, events)
+  ask(how_many_classmates_collected_events_from_instagram, events)
+  ask(who_has_the_most_events, events)
+  ask(which_app_has_most_events, events)
+  ask(who_has_the_least_events, events)
+  ask(which_app_has_least_events, events)
   ask(question9, events)
   ask(question10, events)
 }
@@ -141,36 +142,130 @@ function whose_data_is_available(events){
   return _.keys(events).join(' , ')
 }
 
-function question1(events){
-  return '...'
+function getGoodEvents(events) {
+  var eventArray = _.pairs(events);
+  var goodArray = _.filter(eventArray,function(d){
+    // d[0] has username, d[1] has object
+    if (_.isNull(d[1])) return false;
+    if (!_.isObject(d[1])) return false;
+    // somebody (drewdinger) didn't put the app in the path
+    var aKey = _.first(_.keys(d[1]));
+    if ((_.has(d[1],[aKey,'Date']) || _.has(d[1],[aKey,'date'])))
+      return false
+    return true
+  });
+  // somebody (94kazakov) has calendar:test(no objects)
+  // clean that out!
+  var cleanerArray = _.map(goodArray, function(d){
+    d[1] = _.pick(d[1], _.isObject)
+    return d;
+  })
+  return _.zipObject(cleanerArray)
+}
+function where_are_events_from(events){
+  var goodEvents = getGoodEvents(events);
+  sources = _.mapValues(goodEvents, function(d){  
+        return _.keys(d);
+  })
+  
+  var s2 = _.transform(sources, function(result,d){
+      if (_.size(d) > 0){
+        result.push(d)
+      }
+      return true;  // return false to stop iteration early
+  },[])
+  var sourceUniq = _.uniq(_.flatten(s2))
+  return sourceUniq.join(', ')
 }
 
-function question2(events){
-  return '...'
+function how_many_gmails(events){
+  var goodEvents = getGoodEvents(events);
+  var numGmail = _.sum(goodEvents, function(d){
+    return _.size(d.gmail)
+  })
+
+  return numGmail+' gmail events collected'
 }
 
-function question3(events){
-  return '...'
+function how_many_classmates_collected_events_from_instagram(events){
+  var goodEvents = getGoodEvents(events);
+  var instagramUsers = _.filter(goodEvents,function(d){
+        return _.includes(_.keys(d),'instagram')  
+  })
+  return _.size(instagramUsers)+ ' classsmates'
 }
 
-function question4(events){
-  return '...'
+function ok_but_who_did_it_right(events){
+  var goodEvents = getGoodEvents(events);
+   return _.keys(goodEvents).join(', ')
 }
 
-function question5(events){
-  return '...'
+function who_has_the_most_events(events){
+    var goodEvents = getGoodEvents(events);
+    var eventCounts = _.mapValues(goodEvents, function(d){
+      return _.sum(d, function (e,key){
+        return _.size(e)
+      })
+    })
+    eventCountArr = _.pairs(eventCounts);
+    var maxArr = _.max(eventCountArr,function(d){
+      return d[1];
+    })
+
+  return maxArr[0] +" had "+ maxArr[1]
 }
 
-function question6(events){
-  return '...'
+function which_app_has_most_events(events){
+  var goodEvents = getGoodEvents(events);
+  var sourceNames = _.words(where_are_events_from(events),/[^, ]/)
+  var counts = _.map(sourceNames, function(d){
+      var count = _.sum(goodEvents, function(e){
+        return _.size(e[d])
+      })
+      var obj = {}
+      obj[d] = count
+      return obj
+  });
+    var maxObj = _.max(counts,function(d){
+      return _.values(d)[0];
+    })
+  
+return _.keys(maxObj)[0] +" had "+ _.values(maxObj)[0]
+
+
 }
 
-function question7(events){
-  return '...'
-}
+function who_has_the_least_events(events){
+    var goodEvents = getGoodEvents(events);
+    var eventCounts = _.mapValues(goodEvents, function(d){
+      return _.sum(d, function (e,key){
+        return _.size(e)
+      })
+    })
+    eventCountArr = _.pairs(eventCounts);
+    var minArr = _.min(eventCountArr,function(d){
+      return d[1];
+    })
 
-function question8(events){
-  return '...'
+  return minArr[0] +" had "+ minArr[1]}
+
+function which_app_has_least_events(events){
+ var goodEvents = getGoodEvents(events);
+  var sourceNames = _.words(where_are_events_from(events),/[^, ]/)
+  var counts = _.map(sourceNames, function(d){
+      var count = _.sum(goodEvents, function(e){
+        return _.size(e[d])
+      })
+      var obj = {}
+      obj[d] = count
+      return obj
+  });
+    var minObj = _.min(counts,function(d){
+      return _.values(d)[0];
+    })
+  
+return _.keys(minObj)[0] +" had "+ _.values(minObj)[0]
+
 }
 
 function question9(events){
