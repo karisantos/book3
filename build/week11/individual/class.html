@@ -217,7 +217,7 @@ function who_has_the_most_events(events){
 
 function which_app_has_most_events(events){
   var goodEvents = getGoodEvents(events);
-  var sourceNames = _.words(where_are_events_from(events),/[^, ]/)
+  var sourceNames = _.words(where_are_events_from(events))
   var counts = _.map(sourceNames, function(d){
       var count = _.sum(goodEvents, function(e){
         return _.size(e[d])
@@ -251,7 +251,7 @@ function who_has_the_least_events(events){
 
 function which_app_has_least_events(events){
  var goodEvents = getGoodEvents(events);
-  var sourceNames = _.words(where_are_events_from(events),/[^, ]/)
+  var sourceNames = _.words(where_are_events_from(events))
   var counts = _.map(sourceNames, function(d){
       var count = _.sum(goodEvents, function(e){
         return _.size(e[d])
