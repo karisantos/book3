@@ -130,8 +130,8 @@ function analyze(events){
   ask(which_app_has_most_events, events)
   ask(who_has_the_least_events, events)
   ask(which_app_has_least_events, events)
-  ask(question9, events)
-  ask(question10, events)
+  ask(who_captured_slack, events)
+  ask(how_many_youtube, events)
 }
 
 function how_many_individuals_analyzed_so_far(events){
@@ -268,12 +268,26 @@ return _.keys(minObj)[0] +" had "+ _.values(minObj)[0]
 
 }
 
-function question9(events){
-  return '...'
-}
+function who_captured_slack(events){
+  var goodEvents = getGoodEvents(events);
+  var pairs = _.pairs(goodEvents)
+  var slackUsers = _.filter(pairs,function(d){
+        return _.includes(_.keys(d[1]),'slack')  
+  })
+  users =   _.map(slackUsers, function(d){
+      return d[0]
 
-function question10(events){
-  return '...'
+  } );
+  return users.join(' , ')
+
+}
+function how_many_youtube(events){
+  var goodEvents = getGoodEvents(events);
+  var numGmail = _.sum(goodEvents, function(d){
+    return _.size(d.youtube)
+  })
+
+  return numGmail+' youtube events collected'
 }
 
 
