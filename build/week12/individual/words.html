@@ -379,13 +379,33 @@ function func10(){
 
     // do any words have length 11?
     group11 = _.filter(grouped, function(d){
-      return d.length == 11;
+      return d.length == 11 && d[0].word != "war"
     })
 
+    var decades = ["1900","1910","1920","1930","1940","1950","1960","1970","1980","1990","2000",]
+    var returnStr = '<table border="1" ><tr><th>Word</th><th>Rank 1900</th><th>Rank 1910</th><th>Rank 1920</th><th>Rank 1930</th><th>Rank 1940</th><th>Rank 1950</th><th>Rank 1960</th><th>Rank 1970</th><th>Rank 1980</th><th>Rank 1990</th><th>Rank 2000</th></tr>'
+    returnStr+="<tr><td>"+warArr[0].word+"</td>"
+    _.forEach(decades,function(d) {
+      var rank = _.detect(warArr,'decade',d).rank
+        returnStr+="<td>"+rank+"</td>"
+      });
+    returnStr+="</tr>"
+    _.forEach(group11, function(d){
+      returnStr+="<tr><td>"+d[0].word+"</td>";
+      _.forEach(decades,function(e) {
+        var rank = _.detect(d,'decade',e).rank
+          returnStr+="<td>"+rank+"</td>"
+        });
+    returnStr+="</tr>"
+    })
+    returnStr += "</table>"
+  return returnStr
   var retStr = ""
   _.forEach(group11, function(d){
     retStr+=d[0].word+", "
   })
+
+
   return retStr
 }
 
