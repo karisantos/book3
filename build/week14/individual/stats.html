@@ -46,49 +46,6 @@
 
 var items   // global scope (i.e., can be accessed in javascript console)
 
-function example1(){
-  // http://simplestatistics.org/docs/#mean
-  var stars = _.pluck(items, 'stars')
-  return ss.mean(stars)
-}
-
-function example2(){
-  // http://simplestatistics.org/docs/#max
-  var stars = _.pluck(items, 'review_count')
-  return ss.max(stars)
-}
-
-function solution1(){
-    var reviews = [40,50,60,70,80,90,50]
-    var stars = [2.5,2.5,3.5,3.5,2.5,4.5,4.5]
-    var data = {
-        xs: {
-            stars: 'stars_x'
-        },
-        columns: [
-            ["stars"].concat(stars),  // ["stars",2.5,2.5,3.5,3.5,2.5,4.5,4.5]
-            ["stars_x"].concat(reviews) // ["reviews",40,50,60,70,80,90,50]
-        ],
-        type: 'scatter'
-    }
-
-    var chart = c3.generate({
-      bindto: '#q1 .answer',
-      data: data,
-      axis: {
-          x: {
-              label: 'Reviews'
-          },
-          y: {
-              label: 'Stars',
-              tick: {
-                // manually set tick values
-                values: [0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5]
-              }
-          }
-      }
-    })
-}
 
 //itmes is globat array of Trazact customers
 var top100ID;
@@ -173,19 +130,6 @@ function solution3(){
   
 }
 
-function solution4(){
-var chart = c3.generate({
-    bindto: '#q4 .answer',
-    data: {
-      columns: [
-        ['data1', 30, 200, 100, 400, 150, 250],
-        ['data2', 50, 20, 10, 40, 15, 25]
-      ]
-    }
-});
-
-  
-}
 
 function solution5(){
   var retStr = "";
@@ -195,25 +139,7 @@ function solution5(){
  return retStr;
 }
 
-function solution6(){
-    return 'TODO'
-}
 
-function solution7(){
-    return 'TODO'
-}
-
-function solution8(){
-    return 'TODO'
-}
-
-function solution9(){
-    return 'TODO'
-}
-
-function solution10(){
-    return 'TODO'
-}
 
 function run(id, solutionFunc, data){
     console.log('run solution for ' + id)
@@ -222,32 +148,7 @@ function run(id, solutionFunc, data){
 }
 
 function loadDataThenRunSolutions(){
-   /*$.get({url: 'http://bigdatahci2015.github.io/data/yelp/yelp_academic_dataset_business.5000.json.lines.txt'})
-     .done(function(data){
-         var lines = data.trim().split('\n')
-
-         // convert text lines to json arrays and save them in `items`
-         items = _.map(lines, JSON.parse)
-
-         console.log('number of items loaded:', items.length)
-         console.log('first item', items[0])
-
-         run('#e1', example1, items)
-         run('#e2', example2, items)
-         run('#q1', solution1, items)
-        //  run('#q2', solution2, items)
-        //  run('#q3', solution3, items)
-        //  run('#q4', solution4, items)
-        //  run('#q5', solution5, items)
-        //  run('#q6', solution6, items)
-        //  run('#q7', solution7, items)
-        //  run('#q8', solution8, items)
-        //  run('#q9', solution9, items)
-        //  run('#q10', solution10, items)
-     })
-     .fail(function(err){
-         console.error(err)
-     });  */
+   
     $.get({url: 'TranzactAccount.json'})
      .done(function(data){
          
