@@ -34,6 +34,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow.min.css">
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.9.4/chartist.min.css">
 </head>
 <body>
 
@@ -41,7 +42,7 @@
     <div class="parallax">
       <img src="sonar.jpg">
       <h1 id="title">What is in our ocean?
-        <div class="authors">by [FILL YOUR NAME]</div>
+        <div class="authors">by Kari Santos</div>
       </h1>
     </div>
   </div>
@@ -61,6 +62,13 @@
 
       <div id="questions" class="collection">
       </div>
+      <h4>Distribution of fish as a function of depth</h4>
+      <h5>x axis is Measurement pingIndex</h5>
+      <div class="ct-chart ct-octave" id="chartKari2"></div>
+      <h4>Distribution of zooplankton as a function of depth</h4>
+            <h5>x axis is Measurement pingIndex</h5>
+
+      <div class="ct-chart ct-octave" id="chartKari"></div>
   </div>
 
 
@@ -74,7 +82,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
   <script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
   <script src="http://bigdatahci2015.github.io/data/js/geolib.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.9.4/chartist.min.js"></script>
   <script src="./analysis.js"></script>
 
   <script>
